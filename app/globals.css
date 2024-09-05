@@ -2,3 +2,15 @@
 @tailwind components;
 @tailwind utilities;
   
+
+  
+  .dark {
+    --background-color: #020617; /* Mörk slate bakgrund */
+   
+  }
+  
+  body {
+    background-color: var(--background-color);
+    
+  }
+  

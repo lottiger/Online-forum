@@ -1,5 +1,8 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input'; // För input-komponenten
+import { Textarea } from '@/components/ui/textarea'; // För textarea-komponenten
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'; // För select-komponenten
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -47,41 +50,47 @@ const CreateThread = (): JSX.Element => {
     console.log('Thread created:', newThread);
 
     setTitle("");
-  setDescription("");
-  setCategory("THREAD");
-  
+    setDescription("");
+    setCategory("THREAD");
+
     router.push('/');
   };
 
   return (
     <div className='flex justify-center items-center min-h-screen'>
-      <div className='flex flex-col w-full max-w-md p-4 bg-white rounded shadow-md'>
+      <div className='flex flex-col w-full max-w-md p-4 rounded shadow-md'>
         <h1 className='text-2xl font-bold mb-4'>Create Thread</h1>
+        
         {error.auth && <p className='text-red-500'>{error.auth}</p>}
-        <input
+
+        <Input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className='mb-2 p-2 border rounded'
+          className='mb-2'
         />
         {error.title && <p className='text-red-500'>{error.title}</p>}
-        <textarea
+
+        <Textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className='mb-2 p-2 border rounded'
+          className='mb-2'
         />
         {error.description && <p className='text-red-500'>{error.description}</p>}
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as ThreadCategory)}
-          className='mb-2 p-2 border rounded'
-        >
-          <option value="THREAD">Discussion</option>
-          <option value="QNA">Q&A</option>
-        </select>
-        <Button onClick={handleSubmit} className=''>
+
+        <Select onValueChange={(value) => setCategory(value as ThreadCategory)} value={category}>
+          <SelectTrigger className='mb-2'>
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="THREAD">Discussion</SelectItem>
+            <SelectItem value="QNA">Q&A</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button onClick={handleSubmit} className='w-full'>
           Create
         </Button>
       </div>

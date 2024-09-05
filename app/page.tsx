@@ -10,7 +10,6 @@ export default function Home() {
       <Rootlayout>
         
         <main>
-          <h1>Online Forum</h1>
          <CreateThread />
          <ThreadList />
         </main>

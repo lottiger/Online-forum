@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -80,9 +81,9 @@ const CreateThread = (): JSX.Element => {
           <option value="THREAD">Discussion</option>
           <option value="QNA">Q&A</option>
         </select>
-        <button onClick={handleSubmit} className='p-2 bg-blue-500 text-white rounded'>
+        <Button onClick={handleSubmit} className=''>
           Create
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 
 
-type ThreadCategory = "THREAD" | "QNA";
+type ThreadCategory = "THREAD" | "QNA" | "DISCUSSION";
 
 type User = {
   userName: string;
@@ -20,6 +20,11 @@ type QNAThread = Thread & { //Type extension
   category: "QNA";
   isAnswered: boolean;
   commentAnswerId?: number;
+};
+
+type DiscussionThread = Thread & { //Type extension
+  category: "DISCUSSION";
+  discussionPoints: string[];
 };
 
 type ForumComment = {

@@ -1,35 +1,21 @@
-'use client'
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 
-interface Thread {
-  id: number;
-  title: string;
-  category: string;
-  creationDate: string;
-  description: string;
-  creator: {
-    userName: string;
-    password: string;
-  };
-}
 
-const ThreadDetails = (): JSX.Element => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+const ThreadDetails = ({ threadId }: { threadId: string | undefined }): JSX.Element => {
   const [thread, setThread] = useState<Thread | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (threadId) {
       // Hämta tråden från localStorage
       const storedThreads = JSON.parse(localStorage.getItem('threads') || '[]');
       console.log('Stored Threads:', storedThreads);
-      const foundThread = storedThreads.find((t: Thread) => t.id === parseInt(id as string, 10));
+      const foundThread = storedThreads.find((t: Thread) => t.id === parseInt(threadId, 10));
       console.log('Found Thread:', foundThread);
-      setThread(foundThread);
+      setThread(foundThread || null);
     }
-  }, [id]);
+  }, [threadId]);
 
   if (!thread) {
     return <div>Loading...</div>;
@@ -38,10 +24,10 @@ const ThreadDetails = (): JSX.Element => {
   return (
     <div>
       <h2>{thread.title}</h2>
-      <p><strong>Category:</strong> {thread.category}</p>
-      <p><strong>Created on:</strong> {thread.creationDate}</p>
-      <p><strong>Description:</strong> {thread.description}</p>
-      <p><strong>Creator:</strong> {thread.creator.userName}</p>
+      <p>Category: {thread.category}</p>
+      <p>Created on: {thread.creationDate}</p>
+      <p>Description: {thread.description}</p>
+      <p>Creator: {thread.creator.userName}</p>
     </div>
   );
 };

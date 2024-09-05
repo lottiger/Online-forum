@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; // För input-komponenten
-import { Textarea } from '@/components/ui/textarea'; // För textarea-komponenten
+import { Input } from '@/components/ui/input'; 
+import { Textarea } from '@/components/ui/textarea'; 
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'; // För select-komponenten
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -51,15 +51,15 @@ const CreateThread = (): JSX.Element => {
 
     setTitle("");
     setDescription("");
-    setCategory("THREAD");
+    setCategory("QNA");
 
     router.push('/');
   };
 
   return (
-    <div className='flex justify-center items-center min-h-screen'>
-      <div className='flex flex-col w-full max-w-md p-4 rounded shadow-md'>
-        <h1 className='text-2xl font-bold mb-4'>Create Thread</h1>
+    <div className='flex justify-center my-10'>
+      <div className='flex flex-col w-full max-w-md p-4 rounded border'>
+        <h1 className='text-2xl font-semibold mb-4'>Share something..</h1>
         
         {error.auth && <p className='text-red-500'>{error.auth}</p>}
 
@@ -85,7 +85,7 @@ const CreateThread = (): JSX.Element => {
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="THREAD">Discussion</SelectItem>
+            <SelectItem value="DISCUSSION">Discussion</SelectItem>
             <SelectItem value="QNA">Q&A</SelectItem>
           </SelectContent>
         </Select>

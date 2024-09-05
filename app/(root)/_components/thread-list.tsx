@@ -3,20 +3,10 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-interface Thread {
-  id: number;
-  title: string;
-  category: string;
-  creationDate: string;
-  description: string;
-  creator: {
-    userName: string;
-    password: string;
-  };
-}
 
 const ThreadList = (): JSX.Element => {
   const [threads, setThreads] = useState<Thread[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     // Hämta trådar från localStorage
@@ -25,21 +15,28 @@ const ThreadList = (): JSX.Element => {
     setThreads(storedThreads);
   }, []);
 
+  const handleThreadClick = (id: number) => {
+    router.push(`/${id}`);
+  };
+
   return (
-    <ul>
+    <div className='flex flex-col w-full px-10'>
       {threads.map((thread) => (
-        <li key={thread.id}>
-          <h3>{thread.title}</h3>
-          <p className='text-gray-600'>{new Date(thread.creationDate).toLocaleString()}</p>
-          <p>{thread.description}</p>
-          {thread.creator ? (
-            <p className='text-gray-600'>Created by: {thread.creator.userName}</p>
-          ) : (
-            <p className='text-gray-600'>Creator information is missing</p>
-          )}
-        </li>
+        <section
+          key={thread.id}
+          className='shadow-sm p-3 mb-4 rounded cursor-pointer transform transition-transform duration-200 hover:scale-105'
+          onClick={() => handleThreadClick(thread.id)}
+        >
+          <h3 className='flex justify-center font-semibold text-lg'>{thread.title}</h3>
+          <p className='text-sm'>{thread.description}</p>
+          <div className='flex justify-between text-slate-700 mt-4'>
+            <p className='text-xs'>Category: {thread.category}</p>
+            <p className='text-xs'>Created on: {thread.creationDate}</p>
+            <p className='text-xs'>Creator: {thread.creator.userName}</p>
+          </div>
+        </section>
       ))}
-    </ul>
+    </div>
   );
 };
 

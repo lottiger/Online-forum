@@ -8,9 +8,14 @@
     --background-color: #020617; /* Mörk slate bakgrund */
    
   }
+
+    .light {
+        --color: #262323; 
+    }
   
   body {
     background-color: var(--background-color);
+    color: var(--color);
     
   }
   

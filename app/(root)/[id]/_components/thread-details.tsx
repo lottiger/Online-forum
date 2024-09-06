@@ -1,6 +1,7 @@
-import { Input } from '@/components/ui/input';
+
 import React, { useEffect, useState } from 'react';
-import { LuSend } from "react-icons/lu";
+
+import CommentSection from './comment-section';
 
 
 
@@ -31,17 +32,8 @@ const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Elem
             <p >Created on: {thread.creationDate}</p>
             <p >Creator: {thread.creator.userName}</p>
           </div>
-          <div className='flex justify-center items-center gap-2 mt-5'>
-          <Input
-          className='mt-4'
-          type='text'
-          placeholder='Add a comment...'
-           />
-          <button className='mt-4'>
-            <LuSend style={{ fontSize: '2rem' }}  />
-        
-          </button>
-          </div>
+          
+          <CommentSection />
     </div>
   );
 };

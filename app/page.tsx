@@ -9,11 +9,9 @@ export default function Home() {
   return (
     <>
       <Rootlayout>
-      <div className="flex min-h-screen">
-        <aside className="w-1/6 border-r">
-          <Navbar />
-        </aside>
-        <main className="flex-1 p-4">
+      <div className="">
+     
+        <main className="">
           <CreateThread />
           <ThreadList />
         </main>

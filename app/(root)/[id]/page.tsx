@@ -3,16 +3,27 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import ThreadDetails from './_components/thread-details';
 
-
 function DetailsPage() {
   const params = useParams();
-  const { id } = params;
+  let { id } = params;
+
+  if (Array.isArray(id)) {
+    id = id[0];
+  }
+
+  const threadId = id ? parseInt(id, 10) : undefined;
 
   return (
-    <>
-      <h1>Inlägg {id}</h1>
-      <ThreadDetails threadId={id} />
-    </>
+    <div>
+    <div>
+      {/* <h1>Inlägg {threadId}</h1> */}
+      <ThreadDetails threadId={threadId} />
+
+    </div>
+    <div>
+    
+    </div>
+    </div>
   );
 }
 

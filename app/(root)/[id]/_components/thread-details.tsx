@@ -1,17 +1,18 @@
-'use client';
-
+import { Input } from '@/components/ui/input';
 import React, { useEffect, useState } from 'react';
+import { LuSend } from "react-icons/lu";
 
 
-const ThreadDetails = ({ threadId }: { threadId: string | undefined }): JSX.Element => {
+
+const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Element => {
   const [thread, setThread] = useState<Thread | null>(null);
 
   useEffect(() => {
-    if (threadId) {
+    if (threadId !== undefined) {
       // Hämta tråden från localStorage
-      const storedThreads = JSON.parse(localStorage.getItem('threads') || '[]');
+      const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
       console.log('Stored Threads:', storedThreads);
-      const foundThread = storedThreads.find((t: Thread) => t.id === parseInt(threadId, 10));
+      const foundThread = storedThreads.find((t: Thread) => t.id === threadId);
       console.log('Found Thread:', foundThread);
       setThread(foundThread || null);
     }
@@ -22,12 +23,25 @@ const ThreadDetails = ({ threadId }: { threadId: string | undefined }): JSX.Elem
   }
 
   return (
-    <div>
-      <h2>{thread.title}</h2>
-      <p>Category: {thread.category}</p>
-      <p>Created on: {thread.creationDate}</p>
-      <p>Description: {thread.description}</p>
-      <p>Creator: {thread.creator.userName}</p>
+    <div className='border p-4 rounded mx-20 mt-10'>
+      <h3 className='flex justify-center font-semibold text-lg'>{thread.title}</h3>
+          <p className='text-sm'>{thread.description}</p>
+          <div className='flex justify-between text-slate-700 mt-4 text-xs'>
+            <p >Category: {thread.category}</p>
+            <p >Created on: {thread.creationDate}</p>
+            <p >Creator: {thread.creator.userName}</p>
+          </div>
+          <div className='flex justify-center items-center gap-2 mt-5'>
+          <Input
+          className='mt-4'
+          type='text'
+          placeholder='Add a comment...'
+           />
+          <button className='mt-4'>
+            <LuSend style={{ fontSize: '2rem' }}  />
+        
+          </button>
+          </div>
     </div>
   );
 };

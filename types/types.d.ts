@@ -3,6 +3,7 @@
 type ThreadCategory = "THREAD" | "QNA" | "DISCUSSION";
 
 type User = {
+ id: number;
   userName: string;
   password: string;
 };
@@ -14,6 +15,7 @@ type Thread = {
   creationDate: string;
   description: string;
   creator: User;
+  isLocked: boolean;
 };
 
 type QNAThread = Thread & { //Type extension
@@ -34,3 +36,13 @@ type ForumComment = {
   creator: User;
   creationDate: string;
 };
+
+type LockThreadProps = {
+  threadId: number;
+  creatorId: number;
+  isLocked: boolean;
+  currentUserId: number | null;
+  onLockToggle: (threadId: number, lockStatus: boolean) => void;
+};
+
+

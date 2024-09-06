@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 
+
 const CreateThread = (): JSX.Element => {
   const router = useRouter();
   const { user } = useUser();
@@ -56,9 +57,11 @@ const CreateThread = (): JSX.Element => {
       creationDate: new Date().toISOString(),
       description,
       creator: {
+        id: parseInt(user.id, 10), // Konvertera user.id till nummer
         userName: user.username || user.primaryEmailAddress?.emailAddress || "",
-        password: "",
+        password: "", // Placeholder, använd inte lösenord i klartext
       },
+      isLocked: false,
     };
 
     // Spara tråden i localStorage

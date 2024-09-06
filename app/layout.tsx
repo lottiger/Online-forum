@@ -7,6 +7,7 @@ import React from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 
 
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             defaultTheme="system"
             >
             {children}
+            <Toaster />
             </ThemeProvider>
           </body>
       

@@ -4,6 +4,9 @@ import { LuSend } from 'react-icons/lu';
 import { useUser } from '@clerk/clerk-react';
 import { formatDistanceToNow } from 'date-fns';
 
+import { ToastProvider, ToastViewport, Toast, ToastTitle, ToastDescription, ToastClose } from '@/components/ui/toast'; // Importera toast-komponenterna
+import { useToast } from '@/hooks/use-toast';
+
 interface CommentSectionProps {
   threadId: number;
 }
@@ -12,6 +15,7 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useUser(); // Hämta den inloggade användaren från Clerk
+  const { toast } = useToast(); // Använd useToast
 
   useEffect(() => {
     // Hämta kommentarer från local storage
@@ -21,7 +25,13 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
   }, [threadId]);
 
   const handleAddComment = () => {
-    if (newComment.trim() === '' || !user) return;
+    if (newComment.trim() === '' || !user) {
+      toast({
+        title: "Oops!",
+        description: newComment.trim() === '' ? "Comment cannot be empty." : "Please sign-in to add a comment.",
+      });
+      return;
+    }
 
     const newCommentObj: ForumComment = {
       id: Date.now(),
@@ -44,41 +54,44 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
   };
 
   return (
-    <div>
-      <div className='flex justify-center items-center gap-2 mt-5'>
-        <Input
-          className='mt-4'
-          type='text'
-          placeholder='Add a comment...'
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-        />
-        <button className='mt-4' onClick={handleAddComment}>
-          <LuSend style={{ fontSize: '1.7rem' }} />
-        </button>
-      </div>
-      
-      <ul>
-  {comments.map((comment, index) => {
-    const creationDate = new Date(comment.creationDate);
-    const isValidDate = !isNaN(creationDate.getTime());
-    const isFirst = index === 0;
-    const isLast = index === comments.length - 1;
-    return (
-      <li
-        key={comment.id}
-        className={`py-4 ${!isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
-      >
-        <div className='flex justify-between text-xs my-4'>
-          <p>{comment.creator.userName}</p>
-          <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
+    <ToastProvider>
+      <div>
+        <div className='flex justify-center items-center gap-2 mt-5'>
+          <Input
+            className='mt-4'
+            type='text'
+            placeholder='Add a comment...'
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+          <button className='mt-4' onClick={handleAddComment}>
+            <LuSend style={{ fontSize: '1.7rem' }} />
+          </button>
         </div>
-        <p className='text-sm'>{comment.content}</p>
-      </li>
-    );
-  })}
-</ul>
-    </div>
+        
+        <ul>
+          {comments.map((comment, index) => {
+            const creationDate = new Date(comment.creationDate);
+            const isValidDate = !isNaN(creationDate.getTime());
+            const isFirst = index === 0;
+            const isLast = index === comments.length - 1;
+            return (
+              <li
+                key={comment.id}
+                className={`py-4 ${!isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
+              >
+                <div className='flex justify-between text-xs my-4'>
+                  <p>{comment.creator.userName}</p>
+                  <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
+                </div>
+                <p className='text-sm'>{comment.content}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <ToastViewport />
+    </ToastProvider>
   );
 }
 

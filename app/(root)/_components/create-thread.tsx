@@ -6,10 +6,13 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+
 
 const CreateThread = (): JSX.Element => {
   const router = useRouter();
   const { user } = useUser();
+  const { toast } = useToast(); // Använd useToast
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<ThreadCategory>("THREAD");
@@ -17,7 +20,11 @@ const CreateThread = (): JSX.Element => {
 
   const handleSubmit = () => {
     if (!user) {
-      setError((prevError) => ({ ...prevError, auth: "You must be logged in to create a thread." }));
+      setError((prevError) => ({ ...prevError, auth: "You need to have an account to create a thread." }));
+      toast({
+        title: "Oops!",
+        description: "You need to have an account to create a thread.",
+      });
       return;
     }
 
@@ -27,6 +34,18 @@ const CreateThread = (): JSX.Element => {
         title: !title ? "Title is required." : "",
         description: !description ? "Description is required." : "",
       }));
+      if (!title) {
+        toast({
+          title: "Error",
+          description: "Title is required.",
+        });
+      }
+      if (!description) {
+        toast({
+          title: "Error",
+          description: "Description is required.",
+        });
+      }
       return;
     }
 
@@ -61,8 +80,6 @@ const CreateThread = (): JSX.Element => {
       <div className='flex flex-col w-full max-w-md p-4 rounded border'>
         <h1 className='text-2xl font-semibold mb-4'>Share something..</h1>
         
-        {error.auth && <p className='text-red-500'>{error.auth}</p>}
-
         <Input
           type="text"
           placeholder="Title"
@@ -70,7 +87,6 @@ const CreateThread = (): JSX.Element => {
           onChange={(e) => setTitle(e.target.value)}
           className='mb-2'
         />
-        {error.title && <p className='text-red-500'>{error.title}</p>}
 
         <Textarea
           placeholder="Description"
@@ -78,7 +94,6 @@ const CreateThread = (): JSX.Element => {
           onChange={(e) => setDescription(e.target.value)}
           className='mb-2'
         />
-        {error.description && <p className='text-red-500'>{error.description}</p>}
 
         <Select onValueChange={(value) => setCategory(value as ThreadCategory)} value={category}>
           <SelectTrigger className='mb-2'>

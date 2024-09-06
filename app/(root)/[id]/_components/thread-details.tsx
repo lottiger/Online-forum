@@ -33,7 +33,7 @@ const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Elem
             <p >Creator: {thread.creator.userName}</p>
           </div>
           
-          <CommentSection />
+          <CommentSection threadId={thread.id} />
     </div>
   );
 };

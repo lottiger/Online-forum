@@ -28,7 +28,10 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
       id: Date.now(),
       thread: threadId,
       content: newComment,
-      creator: { userName: user.fullName || user.username || 'Anonymous' } // Använd Clerk-användarens namn
+      creator: { 
+        userName: user.fullName || user.username || 'Anonymous',
+        password: 'defaultPassword' // Lägg till ett standardvärde för password
+      }
     };
 
     const updatedComments = [...comments, newCommentObj];
@@ -42,7 +45,16 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
 
   return (
     <div>
-       <div className='flex justify-center items-center gap-2 mt-5'>
+      <h3>Comments</h3>
+      <ul>
+        {comments.map(comment => (
+          <li key={comment.id}>
+            <p>{comment.content}</p>
+            <p><strong>{comment.creator.userName}</strong></p>
+          </li>
+        ))}
+      </ul>
+      <div className='flex justify-center items-center gap-2 mt-5'>
         <Input
           className='mt-4'
           type='text'
@@ -54,17 +66,6 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
           <LuSend style={{ fontSize: '2rem' }} />
         </button>
       </div>
-      
-      <ul>
-        {comments.map(comment => (
-          <li key={comment.id}>
-             <p><strong>{comment.creator.userName}</strong></p>
-            <p>{comment.content}</p>
-           
-          </li>
-        ))}
-      </ul>
-     
     </div>
   );
 }

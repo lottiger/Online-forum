@@ -32,4 +32,5 @@ type ForumComment = {
   thread: number;
   content: string;
   creator: User;
+  creationDate: string;
 };

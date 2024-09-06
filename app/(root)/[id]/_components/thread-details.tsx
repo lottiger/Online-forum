@@ -29,7 +29,7 @@ const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Elem
           <p className='text-sm'>{thread.description}</p>
           <div className='flex justify-between text-slate-700 mt-4 text-xs'>
             <p >Category: {thread.category}</p>
-            <p >Created on: {thread.creationDate}</p>
+            <p>Created: {new Date(thread.creationDate).toLocaleDateString()}</p>
             <p >Creator: {thread.creator.userName}</p>
           </div>
           

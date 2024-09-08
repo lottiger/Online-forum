@@ -1,48 +1,48 @@
-
-
 type ThreadCategory = "THREAD" | "QNA" | "DISCUSSION";
 
-type User = {
- id: number;
+// Clerk-användare använder strängbaserade ID:n
+type ClerkUser = {
+  id: string; // Clerk's ID är en sträng
   userName: string;
-  password: string;
 };
 
+// Trådar använder Clerk-användare
 type Thread = {
   id: number;
   title: string;
-  category: string;
+  category: ThreadCategory;
   creationDate: string;
   description: string;
-  creator: User;
+  creator: ClerkUser; // Skaparen av tråden är en ClerkUser
   isLocked: boolean;
 };
 
-type QNAThread = Thread & { //Type extension
+// QNA-tråd med extra fält
+type QNAThread = Thread & {
   category: "QNA";
   isAnswered: boolean;
   commentAnswerId?: number;
 };
 
-type DiscussionThread = Thread & { //Type extension
+// Diskussionstråd med extra fält
+type DiscussionThread = Thread & {
   category: "DISCUSSION";
   discussionPoints: string[];
 };
 
+// Kommentarer i trådar
 type ForumComment = {
   id: number;
-  thread: number;
+  threadId: number; // Förtydligande av namngivning
   content: string;
-  creator: User;
+  creator: ClerkUser; // Skaparen av kommentaren är en ClerkUser
   creationDate: string;
 };
 
+// Typ för props till LockThread-komponenten
 type LockThreadProps = {
   threadId: number;
-  creatorId: number;
+  creatorId: string; // Använd sträng för ID eftersom det är ett ClerkUser ID
   isLocked: boolean;
-  currentUserId: number | null;
   onLockToggle: (threadId: number, lockStatus: boolean) => void;
 };
-
-

@@ -8,12 +8,10 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-
-
 const CreateThread = (): JSX.Element => {
   const router = useRouter();
   const { user } = useUser();
-  const { toast } = useToast(); // Använd useToast
+  const { toast } = useToast();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<ThreadCategory>("THREAD");
@@ -57,9 +55,8 @@ const CreateThread = (): JSX.Element => {
       creationDate: new Date().toISOString(),
       description,
       creator: {
-        id: parseInt(user.id, 10), // Konvertera user.id till nummer
-        userName: user.username || user.primaryEmailAddress?.emailAddress || "",
-        password: "", // Placeholder, använd inte lösenord i klartext
+        id: user.id, // Använd ClerkUser id direkt
+        userName: user.username || user.primaryEmailAddress?.emailAddress || ""
       },
       isLocked: false,
     };

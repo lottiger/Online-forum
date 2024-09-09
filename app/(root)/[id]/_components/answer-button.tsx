@@ -1,14 +1,21 @@
-import React from 'react'
+import React from 'react';
 import { CiCircleCheck } from "react-icons/ci";
 
-
-const AnswerButton = () => {
-  return (
-    <div>
-        <CiCircleCheck style={{ fontSize: '1.3rem' }}/>
-
-    </div>
-  )
+interface AnswerButtonProps {
+  isAnswer: boolean; // Är den här kommentaren markerad som svaret?
+  onToggle: () => void; // Callback för att markera som svar
 }
 
-export default AnswerButton
+const AnswerButton: React.FC<AnswerButtonProps> = ({ isAnswer, onToggle }) => {
+  return (
+    <div onClick={onToggle} style={{ cursor: 'pointer' }}>
+      {isAnswer ? (
+        <CiCircleCheck style={{ fontSize: '1.3rem', color: 'green' }} />
+      ) : (
+        <CiCircleCheck style={{ fontSize: '1.3rem' }} />
+      )}
+    </div>
+  );
+};
+
+export default AnswerButton;

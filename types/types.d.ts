@@ -37,6 +37,8 @@ type ForumComment = {
   content: string;
   creator: ClerkUser; // Skaparen av kommentaren är en ClerkUser
   creationDate: string;
+ 
+  
 };
 
 // Typ för props till LockThread-komponenten

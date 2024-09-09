@@ -1,24 +1,36 @@
-
 import React, { useEffect, useState } from 'react';
-
 import CommentSection from './comment-section';
 
-
-
-
 const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Element => {
-  const [thread, setThread] = useState<Thread | null>(null);
+  const [thread, setThread] = useState<QNAThread | null>(null);
 
   useEffect(() => {
     if (threadId !== undefined) {
       // Hämta tråden från localStorage
       const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
-      console.log('Stored Threads:', storedThreads);
       const foundThread = storedThreads.find((t: Thread) => t.id === threadId);
-      console.log('Found Thread:', foundThread);
-      setThread(foundThread || null);
+      setThread(foundThread as QNAThread || null);
     }
   }, [threadId]);
+
+  const handleAnswerSelect = (commentId: number) => {
+    if (!thread) return;
+
+    // Uppdatera tråden med det nya svaret
+    const updatedThread = {
+      ...thread,
+      commentAnswerId: commentId,
+      isAnswered: true,
+    };
+
+    // Uppdatera localStorage
+    const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
+    const updatedThreads = storedThreads.map((t: Thread) => (t.id === thread.id ? updatedThread : t));
+    localStorage.setItem('threads', JSON.stringify(updatedThreads));
+
+    // Uppdatera lokal state
+    setThread(updatedThread);
+  };
 
   if (!thread) {
     return <div>Loading...</div>;
@@ -27,14 +39,20 @@ const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Elem
   return (
     <div className='border p-4 rounded mx-20 mt-10'>
       <h3 className='flex justify-center font-semibold text-lg'>{thread.title}</h3>
-          <p className='text-sm'>{thread.description}</p>
-          <div className='flex justify-between text-slate-700 mt-4 text-xs'>
-            <p >{thread.category}</p>
-            <p>{new Date(thread.creationDate).toLocaleDateString()}</p>
-            <p >By {thread.creator.userName}</p>
-          </div>
-          
-          <CommentSection threadId={thread.id} />
+      <p className='text-sm'>{thread.description}</p>
+      <div className='flex justify-between text-slate-700 mt-4 text-xs'>
+        <p>{thread.category}</p>
+        <p>{new Date(thread.creationDate).toLocaleDateString()}</p>
+        <p>By {thread.creator.userName}</p>
+      </div>
+
+      {/* Skicka in props för markering av svar */}
+      <CommentSection
+        threadId={thread.id}
+        creatorId={thread.creator.id}
+        commentAnswerId={thread.commentAnswerId}
+        onAnswerSelect={handleAnswerSelect}
+      />
     </div>
   );
 };

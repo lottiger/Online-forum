@@ -11,7 +11,18 @@ interface CommentSectionProps {
   threadId: number;
   creatorId: string; // Skaparen av tråden
   commentAnswerId?: number; // Vilken kommentar är markerad som svaret?
-  onAnswerSelect: (commentId: number) => void; // Callback när ett svar väljs
+  onAnswerSelect: (commentId: number | null) => void; // Callback när ett svar väljs eller avmarkeras
+}
+
+interface ForumComment {
+  id: number;
+  threadId: number;
+  content: string;
+  creator: {
+    id: string;
+    userName: string;
+  };
+  creationDate: string;
 }
 
 function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }: CommentSectionProps): JSX.Element {
@@ -20,13 +31,16 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }
   const { user } = useUser();
   const { toast } = useToast();
 
+  // Hämta kommentarer från localStorage för den specifika tråden
   useEffect(() => {
-    // Fetch comments from local storage
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
+    
+    // Filtrera ut kommentarer som tillhör den aktuella tråden
     const threadComments = storedComments.filter(comment => comment.threadId === threadId);
     setComments(threadComments);
   }, [threadId]);
 
+  // Hantera att lägga till en ny kommentar
   const handleAddComment = () => {
     if (newComment.trim() === '' || !user) {
       toast({
@@ -41,18 +55,37 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }
       threadId: threadId,
       content: newComment,
       creator: { 
-        id: user.id,
+        id: user.id, 
         userName: user.firstName || user.username || 'Anonymous',
       },
       creationDate: new Date().toISOString(),
     };
 
-    const updatedComments = [...comments, newCommentObj];
+    // Hämta alla sparade kommentarer
+    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
+    
+    // Lägg till den nya kommentaren till den aktuella trådens kommentarer
+    const threadComments = storedComments.filter((comment: ForumComment) => comment.threadId === threadId);
+    const updatedComments = [...threadComments, newCommentObj];
+
+    // Uppdatera alla kommentarer och spara till localStorage
+    const allComments = [...storedComments.filter((comment: ForumComment) => comment.threadId !== threadId), ...updatedComments];
+    localStorage.setItem('comments', JSON.stringify(allComments));
+
+    // Uppdatera komponentens lokala state
     setComments(updatedComments);
     setNewComment('');
 
-    // Save updated comments to local storage
-    localStorage.setItem('comments', JSON.stringify([...comments, newCommentObj]));
+    console.log("Saved comments:", JSON.parse(localStorage.getItem('comments') || '[]'));
+  };
+
+  // Hantera toggling av ett svar
+  const handleAnswerToggle = (commentId: number) => {
+    if (commentId === commentAnswerId) {
+      onAnswerSelect(null); // Avmarkera svaret
+    } else {
+      onAnswerSelect(commentId); // Markera kommentaren som svaret
+    }
   };
 
   return (
@@ -74,7 +107,8 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }
         {comments.map((comment) => {
           const creationDate = new Date(comment.creationDate);
           const isValidDate = !isNaN(creationDate.getTime());
-          const isAnswer = comment.id === commentAnswerId; // Är den här kommentaren markerad som svaret?
+          const isAnswer = comment.id === commentAnswerId;
+          const canToggle = user?.id === creatorId; // Endast skaparen kan toggla svaret
 
           return (
             <li key={comment.id} className="py-4 border-t">
@@ -82,13 +116,12 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }
                 <p>{comment.creator.userName}</p>
                 <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
 
-                {/* Endast trådskaparen kan markera ett svar */}
-                {user?.id === creatorId && (
-                  <AnswerButton
-                    isAnswer={isAnswer}
-                    onToggle={() => onAnswerSelect(comment.id)} // Callback när kommentaren markeras som svaret
-                  />
-                )}
+                {/* Alla ser markeringen, men endast skaparen kan toggla */}
+                <AnswerButton
+                  isAnswer={isAnswer}
+                  canToggle={canToggle}
+                  onToggle={() => handleAnswerToggle(comment.id)}
+                />
               </div>
               <p className='text-sm'>{comment.content}</p>
             </li>

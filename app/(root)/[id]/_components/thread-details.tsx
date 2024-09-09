@@ -13,14 +13,14 @@ const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Elem
     }
   }, [threadId]);
 
-  const handleAnswerSelect = (commentId: number) => {
+  const handleAnswerSelect = (commentId: number | null) => {
     if (!thread) return;
 
-    // Uppdatera tråden med det nya svaret
+    // Uppdatera tråden med det nya svaret eller avmarkeringen
     const updatedThread = {
       ...thread,
-      commentAnswerId: commentId,
-      isAnswered: true,
+      commentAnswerId: commentId || undefined,
+      isAnswered: !!commentId, // Om det finns ett markerat svar
     };
 
     // Uppdatera localStorage

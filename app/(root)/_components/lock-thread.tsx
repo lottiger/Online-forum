@@ -2,14 +2,13 @@
 
 import React from 'react';
 import { CiLock, CiUnlock } from 'react-icons/ci';
-import { useUser } from '@clerk/nextjs'; // To get the logged-in user (if any)
+import { useUser } from '@clerk/nextjs'; 
 
-
-const LockThread: React.FC<LockThreadProps> = ({ threadId, creatorId, isLocked, onLockToggle }) => {
+const LockThread = ({ threadId, creatorId, isLocked, onLockToggle }: LockThreadProps): JSX.Element => {
   const { user } = useUser(); // Get the logged-in user from Clerk
 
   const handleLockToggle = () => {
-    if (user?.id === creatorId) { // Direct comparison without converting to string
+    if (user?.id === creatorId) {
       // Only the creator of the thread can toggle the lock status
       onLockToggle(threadId, !isLocked);
     }
@@ -19,7 +18,7 @@ const LockThread: React.FC<LockThreadProps> = ({ threadId, creatorId, isLocked, 
   const canLockThread = user?.id === creatorId;
 
   return (
-    <div className='flex justify-end'>
+    <div className="flex justify-end">
       {canLockThread ? (
         <button onClick={handleLockToggle} aria-label={isLocked ? 'Unlock Thread' : 'Lock Thread'} className="hover:opacity-75 transition-opacity duration-300">
           {isLocked ? <CiLock className="text-2xl text-red-500" /> : <CiUnlock className="text-2xl text-green-500" />}

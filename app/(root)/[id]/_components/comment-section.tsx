@@ -12,7 +12,7 @@ interface CommentSectionProps {
 
 interface ForumComment {
   id: number;
-  thread: number;
+  threadId: number;
   content: string;
   creator: {
     id: string; // Ensure ID is string to align with ClerkUser ID format
@@ -30,7 +30,7 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
   useEffect(() => {
     // Fetch comments from local storage
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
-    const threadComments = storedComments.filter(comment => comment.thread === threadId);
+    const threadComments = storedComments.filter(comment => comment.threadId === threadId);
     setComments(threadComments);
   }, [threadId]);
 
@@ -45,7 +45,7 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
 
     const newCommentObj: ForumComment = {
       id: Date.now(),
-      thread: threadId,
+      threadId: threadId,
       content: newComment,
       creator: { 
         id: user.id, // Use ClerkUser ID directly

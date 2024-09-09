@@ -5,22 +5,12 @@ import { formatDistanceToNow } from 'date-fns';
 
 import { useToast } from '@/hooks/use-toast'; // Make sure your toast imports are correctly utilized
 import { Input } from '@/components/ui/input';
+import AnswerButton from './answer-button';
+
 
 interface CommentSectionProps {
   threadId: number;
 }
-
-interface ForumComment {
-  id: number;
-  threadId: number;
-  content: string;
-  creator: {
-    id: string; // Ensure ID is string to align with ClerkUser ID format
-    userName: string;
-  };
-  creationDate: string;
-}
-
 function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
@@ -65,7 +55,7 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
   return (
     
       <div>
-        <div className='flex justify-center items-center gap-2 mt-5'>
+        <div className='flex justify-center items-center gap-2 m-5'>
           <Input
             className='mt-4'
             type='text'
@@ -87,12 +77,16 @@ function CommentSection({ threadId }: CommentSectionProps): JSX.Element {
                 <div className='flex justify-between text-xs my-4'>
                   <p>{comment.creator.userName}</p>
                   <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
+                  <AnswerButton/>
                 </div>
                 <p className='text-sm'>{comment.content}</p>
               </li>
+              
+              
             );
           })}
         </ul>
+       
       </div>
       
     

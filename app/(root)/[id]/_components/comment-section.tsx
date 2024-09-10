@@ -7,27 +7,7 @@ import { Input } from '@/components/ui/input';
 import AnswerButton from './answer-button';
 import CommentOnComment from './comment-on-comment';
 
-interface CommentSectionProps {
-  threadId: number;
-  creatorId: string; // Skaparen av tråden
-  commentAnswerId?: number; // Vilken kommentar är markerad som svaret?
-  onAnswerSelect: (commentId: number | null) => void; // Callback när ett svar väljs eller avmarkeras
-  category: string; // Kategorin för tråden
-}
-
-interface ForumComment {
-  id: number;
-  threadId: number;
-  content: string;
-  creator: {
-    id: string;
-    userName: string;
-  };
-  creationDate: string;
-  replies?: ForumComment[]; // Lägg till replies för att hantera svar på kommentarer
-}
-
-function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element {
+const CommentSection = ({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element => {
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useUser();

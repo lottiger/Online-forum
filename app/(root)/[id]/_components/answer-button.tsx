@@ -1,14 +1,7 @@
 import React from 'react';
 import { CiCircleCheck } from 'react-icons/ci';
 
-interface AnswerButtonProps {
-  isAnswer: boolean; // Är den här kommentaren markerad som svaret?
-  canToggle: boolean; // Kan den inloggade användaren toggla statusen (endast trådskaparen)?
-  category: string; // Lägg till trådens kategori för att kontrollera om det är en QNA-tråd
-  onToggle: () => void; // Callback för att toggla markeringen
-}
-
-const AnswerButton: React.FC<AnswerButtonProps> = ({ isAnswer, canToggle, category, onToggle }) => {
+const AnswerButton = ({ isAnswer, canToggle, category, onToggle }: AnswerButtonProps): JSX.Element => {
   const isQNA = category === 'QNA'; // Kontrollera om kategorin är QNA
 
   return (

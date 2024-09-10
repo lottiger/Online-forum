@@ -4,12 +4,7 @@ import { Input } from '@/components/ui/input'; // Input-komponent
 import { LuSend } from 'react-icons/lu';
 import { useToast } from '@/hooks/use-toast'; // Lägg till toast för meddelanden
 
-interface CommentOnCommentProps {
-  commentId: number;
-  onAddReply: (commentId: number, reply: string) => void;
-}
-
-const CommentOnComment: React.FC<CommentOnCommentProps> = ({ commentId, onAddReply }) => {
+const CommentOnComment = ({ commentId, onAddReply }: CommentOnCommentProps): JSX.Element => {
   const [reply, setReply] = useState('');
   const { user } = useUser();
   const { toast } = useToast(); // Använd toast för att visa meddelanden

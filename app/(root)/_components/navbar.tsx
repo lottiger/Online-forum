@@ -3,17 +3,22 @@ import Link from 'next/link' // Om du använder Next.js
 
 const Navbar = () => {
   return (
-    <aside className='p-4'>
+    <aside className='flex items-center justify-center mt-14 '>
       <nav>
-        <ul className='space-y-2'>
+        <ul className='space-y-3'>
           <li>
             <Link href='/' className='hover:underline'>
-              Hem
+              Home
             </Link>
           </li>
           <li>
-            <Link href='/profil' className='hover:underline'>
-              Profil
+            <Link href='/' className='hover:underline'>
+              Profile
+            </Link>
+          </li>
+          <li>
+            <Link href='/' className='hover:underline'>
+              Category
             </Link>
           </li>
         </ul>

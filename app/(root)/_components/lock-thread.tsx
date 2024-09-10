@@ -5,17 +5,17 @@ import { CiLock, CiUnlock } from 'react-icons/ci';
 import { useUser } from '@clerk/nextjs'; 
 
 const LockThread = ({ threadId, creatorId, isLocked, onLockToggle }: LockThreadProps): JSX.Element => {
-  const { user } = useUser(); // Get the logged-in user from Clerk
+  const { user } = useUser(); // Hämta den inloggade användaren från Clerk
+
+  const isModerator = user?.publicMetadata?.isModerator || false; // Kontrollera om användaren är moderator
+  const isCreator = user?.id === creatorId; // Kontrollera om användaren är skaparen av tråden
+  const canLockThread = isCreator || isModerator; // Antingen trådskaparen eller moderatorn kan toggla låsstatus
 
   const handleLockToggle = () => {
-    if (user?.id === creatorId) {
-      // Only the creator of the thread can toggle the lock status
+    if (canLockThread) {
       onLockToggle(threadId, !isLocked);
     }
   };
-
-  // Check if the logged-in user is the thread creator
-  const canLockThread = user?.id === creatorId;
 
   return (
     <div className="flex justify-end">

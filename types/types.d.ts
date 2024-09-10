@@ -1,12 +1,15 @@
-// types.d.ts
 
-// Clerk-användare använder strängbaserade ID:n
+
+// ----------------- Clerk & User Types -----------------
 type ClerkUser = {
   id: string; // Clerk's ID är en sträng
   userName: string;
+  isModerator: boolean;
 };
 
-// Trådar använder Clerk-användare
+// ----------------- Thread Types -----------------
+type ThreadCategory = "THREAD" | "QNA" | "DISCUSSION";
+
 type Thread = {
   id: number;
   title: string;
@@ -17,20 +20,20 @@ type Thread = {
   isLocked: boolean;
 };
 
-// QNA-tråd med extra fält
+// QNA-thread med extra fält
 type QNAThread = Thread & {
   category: "QNA";
   isAnswered: boolean;
   commentAnswerId?: number;
 };
 
-// Diskussionstråd med extra fält
+// Discussion-thread med extra fält
 type DiscussionThread = Thread & {
   category: "DISCUSSION";
-  discussionPoints: string[];
+  discussionPoints: string[]; //diskussioner runt flera ämnen inom samma tråd
 };
 
-// Kommentarer i trådar
+// ----------------- Comment Types -----------------
 type ForumComment = {
   id: number;
   threadId: number;
@@ -40,7 +43,9 @@ type ForumComment = {
   replies?: ForumComment[]; // Stöd för svar på kommentarer
 };
 
-// Typ för props till LockThread-komponenten
+// ----------------- Component Props -----------------
+
+// LockThread props
 type LockThreadProps = {
   threadId: number;
   creatorId: string; // Använd sträng för ID eftersom det är ett ClerkUser ID
@@ -48,7 +53,7 @@ type LockThreadProps = {
   onLockToggle: (threadId: number, lockStatus: boolean) => void;
 };
 
-// Typ för props till EditThread-komponenten
+// EditThread props
 type EditThreadProps = {
   threadId: number;
   creatorId: string;
@@ -56,7 +61,7 @@ type EditThreadProps = {
   onThreadDelete: (deletedThreadId: number) => void;
 };
 
-
+// AnswerButton props
 type AnswerButtonProps = {
   isAnswer: boolean; 
   canToggle: boolean; 
@@ -64,13 +69,13 @@ type AnswerButtonProps = {
   onToggle: () => void; // Callback för att toggla markeringen
 };
 
-// Lägg till denna typ i din types.d.ts-fil
-
+// CommentOnComment props
 type CommentOnCommentProps = {
   commentId: number;
   onAddReply: (commentId: number, reply: string) => void;
 };
 
+// CommentSection props
 type CommentSectionProps = {
   threadId: number;
   creatorId: string; // Skaparen av tråden

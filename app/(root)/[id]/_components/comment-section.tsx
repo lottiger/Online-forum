@@ -17,7 +17,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
   // Hämta alla kommentarer från localStorage när tråden laddas
   useEffect(() => {
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
-    const threadComments = storedComments.filter(comment => comment.threadId === threadId);
+    const threadComments = storedComments.filter((comment: ForumComment) => comment.threadId === threadId); // Lägg till typ för comment här
     setComments(threadComments);
   }, [threadId]);
 
@@ -45,22 +45,25 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
     };
 
     // Uppdatera kommentarer i state och localStorage
-    const updatedComments = [...comments, newCommentObj];
+    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
+    const updatedComments = [...storedComments, newCommentObj];
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments);
+    setComments(updatedComments.filter((comment: ForumComment) => comment.threadId === threadId)); // Typ här också
     setNewComment('');
   };
 
   // Hantera borttagning av en kommentar
   const handleDeleteComment = (commentId: number) => {
-    const updatedComments = comments.filter(comment => comment.id !== commentId);
+    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
+    const updatedComments = storedComments.filter((comment: ForumComment) => comment.id !== commentId); // Typ här
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments);
+    setComments(updatedComments.filter((comment: ForumComment) => comment.threadId === threadId)); // Typ här
   };
 
   // Hantera att lägga till ett svar på en kommentar
   const handleAddReply = (commentId: number, reply: string) => {
-    const updatedComments = comments.map(comment =>
+    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
+    const updatedComments = storedComments.map((comment: ForumComment) => // Typ här
       comment.id === commentId
         ? {
             ...comment,
@@ -79,7 +82,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
         : comment
     );
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments);
+    setComments(updatedComments.filter((comment: ForumComment) => comment.threadId === threadId)); // Typ här
   };
 
   // Hantera toggling av en kommentar som "svar"
@@ -107,7 +110,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
       </div>
 
       <ul>
-        {comments.map((comment) => {
+        {comments.map((comment: ForumComment) => { // Typ här också
           const creationDate = new Date(comment.creationDate);
           const isValidDate = !isNaN(creationDate.getTime());
           const isAnswer = comment.id === commentAnswerId;
@@ -149,7 +152,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 onAddReply={handleAddReply}
                 onDeleteReply={(replyId) => {
                   const updatedReplies = comment.replies?.filter(reply => reply.id !== replyId) || [];
-                  const updatedComments = comments.map(c => 
+                  const updatedComments = comments.map((c: ForumComment) => // Typ här
                     c.id === comment.id ? { ...c, replies: updatedReplies } : c
                   );
                   setComments(updatedComments);

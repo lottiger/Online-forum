@@ -72,8 +72,11 @@ type AnswerButtonProps = {
 // CommentOnComment props
 type CommentOnCommentProps = {
   commentId: number;
+  replies: ForumComment[];  // Array av svar på kommentarer
   onAddReply: (commentId: number, reply: string) => void;
+  onDeleteReply: (replyId: number) => void;
 };
+
 
 // CommentSection props
 type CommentSectionProps = {
@@ -82,4 +85,12 @@ type CommentSectionProps = {
   commentAnswerId?: number; // Vilken kommentar är markerad som svaret?
   onAnswerSelect: (commentId: number | null) => void; // Callback när ett svar väljs eller avmarkeras
   category: string; // Kategorin för tråden
+};
+
+type DeleteCommentProps = {
+  creatorId: string;  // Användar-ID för kommentarskaparen
+  commentId: number;  // ID för kommentaren som ska tas bort
+  onDelete: (commentId: number) => void;  // Callback-funktion för att hantera radering
+  userId: string;  // Inloggad användarens ID
+  isModerator: boolean;  // Flagga för om den inloggade användaren är en moderator
 };

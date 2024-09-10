@@ -6,26 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import AnswerButton from './answer-button';
 import CommentOnComment from './comment-on-comment';
-
-interface CommentSectionProps {
-  threadId: number;
-  creatorId: string; // Skaparen av tråden
-  commentAnswerId?: number; // Vilken kommentar är markerad som svaret?
-  onAnswerSelect: (commentId: number | null) => void; // Callback när ett svar väljs eller avmarkeras
-  category: string; // Kategorin för tråden
-}
-
-interface ForumComment {
-  id: number;
-  threadId: number;
-  content: string;
-  creator: {
-    id: string;
-    userName: string;
-  };
-  creationDate: string;
-  replies?: ForumComment[]; // Lägg till replies för att hantera svar på kommentarer
-}
+import DeleteComment from './delete-comment';
 
 function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element {
   const [comments, setComments] = useState<ForumComment[]>([]);
@@ -36,8 +17,6 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
   // Hämta alla kommentarer från localStorage när tråden laddas
   useEffect(() => {
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
-    
-    // Filtrera ut kommentarerna som tillhör den aktuella tråden
     const threadComments = storedComments.filter(comment => comment.threadId === threadId);
     setComments(threadComments);
   }, [threadId]);
@@ -59,32 +38,29 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
       creator: { 
         id: user.id, 
         userName: user.firstName || user.username || 'Anonymous',
+        isModerator: !!user.publicMetadata?.isModerator, // Se till att detta hanteras korrekt
       },
       creationDate: new Date().toISOString(),
       replies: [], // Initiera replies som en tom array
     };
 
-    // Hämta alla kommentarer från localStorage (för alla trådar)
-    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
-
-    // Lägg till den nya kommentaren för den aktuella tråden
-    const updatedComments = [...storedComments, newCommentObj];
-
-    // Spara uppdaterade kommentarer tillbaka till localStorage
+    // Uppdatera kommentarer i state och localStorage
+    const updatedComments = [...comments, newCommentObj];
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-
-    // Uppdatera state med de nya kommentarerna för den specifika tråden
-    setComments(updatedComments.filter(comment => comment.threadId === threadId));
+    setComments(updatedComments);
     setNewComment('');
+  };
+
+  // Hantera borttagning av en kommentar
+  const handleDeleteComment = (commentId: number) => {
+    const updatedComments = comments.filter(comment => comment.id !== commentId);
+    localStorage.setItem('comments', JSON.stringify(updatedComments));
+    setComments(updatedComments);
   };
 
   // Hantera att lägga till ett svar på en kommentar
   const handleAddReply = (commentId: number, reply: string) => {
-    // Hämta alla kommentarer från localStorage (för alla trådar)
-    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
-
-    // Hitta rätt kommentar och uppdatera dess svar (replies)
-    const updatedComments = storedComments.map(comment =>
+    const updatedComments = comments.map(comment =>
       comment.id === commentId
         ? {
             ...comment,
@@ -94,19 +70,16 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
               content: reply, 
               creator: { 
                 id: user?.id || '', 
-                userName: user?.firstName || user?.username || 'Anonymous' 
-              }, 
+                userName: user?.firstName || user?.username || 'Anonymous',
+                isModerator: !!user?.publicMetadata?.isModerator,
+              },
               creationDate: new Date().toISOString() 
             }],
           }
         : comment
     );
-
-    // Spara de uppdaterade kommentarerna tillbaka till localStorage
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-
-    // Uppdatera state med kommentarerna för den aktuella tråden
-    setComments(updatedComments.filter(comment => comment.threadId === threadId));
+    setComments(updatedComments);
   };
 
   // Hantera toggling av en kommentar som "svar"
@@ -138,7 +111,11 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
           const creationDate = new Date(comment.creationDate);
           const isValidDate = !isNaN(creationDate.getTime());
           const isAnswer = comment.id === commentAnswerId;
-          const canToggle = user?.id === creatorId; // Endast skaparen kan toggla svaret
+
+          // Tillåt både trådskaparen och moderatorer att toggla svaret
+          const canToggle = user?.id === creatorId || !!user?.publicMetadata?.isModerator;
+          const isModerator = !!user?.publicMetadata?.isModerator;
+          const canDelete = user?.id === comment.creator.id || isModerator; // Kontrollera raderingstillgång
 
           return (
             <li key={comment.id} className="py-4 border-t">
@@ -150,20 +127,35 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 {category === 'QNA' && (
                   <AnswerButton
                     isAnswer={isAnswer}
-                    canToggle={canToggle}
+                    canToggle={canToggle} // Nu kan både trådskaparen och moderatorn toggla
                     category={category}
                     onToggle={() => handleAnswerToggle(comment.id)}
                   />
                 )}
               </div>
-              <p className='text-sm'>{comment.content}</p>
-              <CommentOnComment commentId={comment.id} onAddReply={handleAddReply} />
-              {comment.replies && comment.replies.map(reply => (
-                <div key={reply.id} className='ml-4 mt-2'>
-                  <p className='text-xs'>{reply.creator.userName}</p>
-                  <p className='text-sm'>{reply.content}</p>
-                </div>
-              ))}
+              <div className='flex justify-between'>
+                <p className='text-sm'>{comment.content}</p>
+                <DeleteComment
+                  creatorId={comment.creator.id}
+                  commentId={comment.id}
+                  userId={user?.id || ''}
+                  isModerator={isModerator}
+                  onDelete={handleDeleteComment}
+                />
+              </div>
+              <CommentOnComment
+                commentId={comment.id}
+                replies={comment.replies || []}
+                onAddReply={handleAddReply}
+                onDeleteReply={(replyId) => {
+                  const updatedReplies = comment.replies?.filter(reply => reply.id !== replyId) || [];
+                  const updatedComments = comments.map(c => 
+                    c.id === comment.id ? { ...c, replies: updatedReplies } : c
+                  );
+                  setComments(updatedComments);
+                  localStorage.setItem('comments', JSON.stringify(updatedComments));
+                }}
+              />
             </li>
           );
         })}

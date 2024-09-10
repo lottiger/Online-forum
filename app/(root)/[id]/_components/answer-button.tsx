@@ -10,7 +10,7 @@ const AnswerButton = ({ isAnswer, canToggle, category, onToggle }: AnswerButtonP
       style={{ cursor: canToggle && isQNA ? 'pointer' : 'default' }}
     >
       {isAnswer ? (
-        <CiCircleCheck style={{ fontSize: '1.3rem', color: 'hotpink', fontWeight: 'bold' }} />
+        <CiCircleCheck style={{ fontSize: '1.3rem', color: 'green', fontWeight: 'bold' }} />
       ) : (
         <CiCircleCheck style={{ fontSize: '1.3rem' }} />
       )}

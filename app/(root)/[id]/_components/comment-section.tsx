@@ -12,6 +12,7 @@ interface CommentSectionProps {
   creatorId: string; // Skaparen av tråden
   commentAnswerId?: number; // Vilken kommentar är markerad som svaret?
   onAnswerSelect: (commentId: number | null) => void; // Callback när ett svar väljs eller avmarkeras
+  category: string; // Kategorin för tråden
 }
 
 interface ForumComment {
@@ -25,22 +26,19 @@ interface ForumComment {
   creationDate: string;
 }
 
-function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }: CommentSectionProps): JSX.Element {
+function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element {
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useUser();
   const { toast } = useToast();
 
-  // Hämta kommentarer från localStorage för den specifika tråden
   useEffect(() => {
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
     
-    // Filtrera ut kommentarer som tillhör den aktuella tråden
     const threadComments = storedComments.filter(comment => comment.threadId === threadId);
     setComments(threadComments);
   }, [threadId]);
 
-  // Hantera att lägga till en ny kommentar
   const handleAddComment = () => {
     if (newComment.trim() === '' || !user) {
       toast({
@@ -61,25 +59,17 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }
       creationDate: new Date().toISOString(),
     };
 
-    // Hämta alla sparade kommentarer
     const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
-    
-    // Lägg till den nya kommentaren till den aktuella trådens kommentarer
     const threadComments = storedComments.filter((comment: ForumComment) => comment.threadId === threadId);
     const updatedComments = [...threadComments, newCommentObj];
 
-    // Uppdatera alla kommentarer och spara till localStorage
     const allComments = [...storedComments.filter((comment: ForumComment) => comment.threadId !== threadId), ...updatedComments];
     localStorage.setItem('comments', JSON.stringify(allComments));
 
-    // Uppdatera komponentens lokala state
     setComments(updatedComments);
     setNewComment('');
-
-    console.log("Saved comments:", JSON.parse(localStorage.getItem('comments') || '[]'));
   };
 
-  // Hantera toggling av ett svar
   const handleAnswerToggle = (commentId: number) => {
     if (commentId === commentAnswerId) {
       onAnswerSelect(null); // Avmarkera svaret
@@ -116,12 +106,15 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect }
                 <p>{comment.creator.userName}</p>
                 <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
 
-                {/* Alla ser markeringen, men endast skaparen kan toggla */}
-                <AnswerButton
-                  isAnswer={isAnswer}
-                  canToggle={canToggle}
-                  onToggle={() => handleAnswerToggle(comment.id)}
-                />
+                {/* Rendera bara AnswerButton om kategorin är QNA */}
+                {category === 'QNA' && (
+                  <AnswerButton
+                    isAnswer={isAnswer}
+                    canToggle={canToggle}
+                    category={category}
+                    onToggle={() => handleAnswerToggle(comment.id)}
+                  />
+                )}
               </div>
               <p className='text-sm'>{comment.content}</p>
             </li>

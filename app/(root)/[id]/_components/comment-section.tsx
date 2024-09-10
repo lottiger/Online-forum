@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { LuSend } from 'react-icons/lu';
 import { useUser } from '@clerk/clerk-react';
 import { formatDistanceToNow } from 'date-fns';
-
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import AnswerButton from './answer-button';
+import CommentOnComment from './comment-on-comment';
 
 interface CommentSectionProps {
   threadId: number;
@@ -24,6 +24,7 @@ interface ForumComment {
     userName: string;
   };
   creationDate: string;
+  replies?: ForumComment[]; // Lägg till replies för att hantera svar på kommentarer
 }
 
 function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element {
@@ -32,13 +33,16 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
   const { user } = useUser();
   const { toast } = useToast();
 
+  // Hämta alla kommentarer från localStorage när tråden laddas
   useEffect(() => {
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
     
+    // Filtrera ut kommentarerna som tillhör den aktuella tråden
     const threadComments = storedComments.filter(comment => comment.threadId === threadId);
     setComments(threadComments);
   }, [threadId]);
 
+  // Lägg till en ny kommentar
   const handleAddComment = () => {
     if (newComment.trim() === '' || !user) {
       toast({
@@ -57,19 +61,55 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
         userName: user.firstName || user.username || 'Anonymous',
       },
       creationDate: new Date().toISOString(),
+      replies: [], // Initiera replies som en tom array
     };
 
-    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
-    const threadComments = storedComments.filter((comment: ForumComment) => comment.threadId === threadId);
-    const updatedComments = [...threadComments, newCommentObj];
+    // Hämta alla kommentarer från localStorage (för alla trådar)
+    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
 
-    const allComments = [...storedComments.filter((comment: ForumComment) => comment.threadId !== threadId), ...updatedComments];
-    localStorage.setItem('comments', JSON.stringify(allComments));
+    // Lägg till den nya kommentaren för den aktuella tråden
+    const updatedComments = [...storedComments, newCommentObj];
 
-    setComments(updatedComments);
+    // Spara uppdaterade kommentarer tillbaka till localStorage
+    localStorage.setItem('comments', JSON.stringify(updatedComments));
+
+    // Uppdatera state med de nya kommentarerna för den specifika tråden
+    setComments(updatedComments.filter(comment => comment.threadId === threadId));
     setNewComment('');
   };
 
+  // Hantera att lägga till ett svar på en kommentar
+  const handleAddReply = (commentId: number, reply: string) => {
+    // Hämta alla kommentarer från localStorage (för alla trådar)
+    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
+
+    // Hitta rätt kommentar och uppdatera dess svar (replies)
+    const updatedComments = storedComments.map(comment =>
+      comment.id === commentId
+        ? {
+            ...comment,
+            replies: [...(comment.replies || []), { 
+              id: Date.now(), 
+              threadId, 
+              content: reply, 
+              creator: { 
+                id: user?.id || '', 
+                userName: user?.firstName || user?.username || 'Anonymous' 
+              }, 
+              creationDate: new Date().toISOString() 
+            }],
+          }
+        : comment
+    );
+
+    // Spara de uppdaterade kommentarerna tillbaka till localStorage
+    localStorage.setItem('comments', JSON.stringify(updatedComments));
+
+    // Uppdatera state med kommentarerna för den aktuella tråden
+    setComments(updatedComments.filter(comment => comment.threadId === threadId));
+  };
+
+  // Hantera toggling av en kommentar som "svar"
   const handleAnswerToggle = (commentId: number) => {
     if (commentId === commentAnswerId) {
       onAnswerSelect(null); // Avmarkera svaret
@@ -89,7 +129,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
           onChange={(e) => setNewComment(e.target.value)}
         />
         <button className='mt-4' onClick={handleAddComment}>
-          <LuSend style={{ fontSize: '1.7rem' }} />
+          <LuSend style={{ fontSize: '1.3rem' }} />
         </button>
       </div>
 
@@ -117,6 +157,13 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 )}
               </div>
               <p className='text-sm'>{comment.content}</p>
+              <CommentOnComment commentId={comment.id} onAddReply={handleAddReply} />
+              {comment.replies && comment.replies.map(reply => (
+                <div key={reply.id} className='ml-4 mt-2'>
+                  <p className='text-xs'>{reply.creator.userName}</p>
+                  <p className='text-sm'>{reply.content}</p>
+                </div>
+              ))}
             </li>
           );
         })}

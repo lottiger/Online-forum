@@ -17,8 +17,9 @@ const DeleteComment = ({ creatorId, commentId, userId, isModerator, onDelete }: 
   return (
     <div>
       {canDelete && (
-        <button onClick={handleDelete} aria-label="Delete Comment" className="hover:opacity-75 transition-opacity duration-300">
-          <CiTrash style={{ fontSize: '1.3rem', color: 'red' }} />
+        <button onClick={handleDelete} aria-label="Delete Comment" className="hover:text-red-700 duration-300">
+          <CiTrash style={{ fontSize: '1.3rem' }} />
+          
         </button>
       )}
     </div>

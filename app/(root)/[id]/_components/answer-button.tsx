@@ -5,7 +5,7 @@ const AnswerButton = ({ isAnswer, canToggle, category, onToggle }: AnswerButtonP
   const isQNA = category === 'QNA'; // Kontrollera om kategorin är QNA
 
   return (
-    <div
+    <div className='hover:text-green-700 duration-300'
       onClick={canToggle && isQNA ? onToggle : undefined}
       style={{ cursor: canToggle && isQNA ? 'pointer' : 'default' }}
     >

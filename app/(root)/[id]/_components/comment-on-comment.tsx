@@ -7,6 +7,7 @@ import DeleteComment from './delete-comment';
 
 const CommentOnComment = ({ commentId, replies, onAddReply, onDeleteReply }: CommentOnCommentProps): JSX.Element => {
   const [reply, setReply] = useState('');
+  const [showReplyInput, setShowReplyInput] = useState(false); // Hanterar synligheten av input-fältet
   const { user } = useUser();
 
   // Lägg till svar på kommentar
@@ -17,6 +18,7 @@ const CommentOnComment = ({ commentId, replies, onAddReply, onDeleteReply }: Com
 
     onAddReply(commentId, reply);
     setReply(''); // Töm fältet efter att svaret har lagts till
+    setShowReplyInput(false); // Stäng input-fältet efter skickat svar
   };
 
   // Hantera borttagning av ett svar
@@ -27,18 +29,28 @@ const CommentOnComment = ({ commentId, replies, onAddReply, onDeleteReply }: Com
   const isModerator = !!user?.publicMetadata?.isModerator;
 
   return (
-    <div className="ml-6">
-      <div className='mt-2 flex gap-2'>
-        <Input
-          type='text'
-          placeholder='Reply...'
-          value={reply}
-          onChange={(e) => setReply(e.target.value)}
-        />
-        <button onClick={handleAddReply}>
-          <LuSend style={{ fontSize: '1.3rem' }} />
+    <div className="">
+      {/* Visa knappen "Reply" om input-fältet inte är synligt */}
+      {!showReplyInput && (
+        <button onClick={() => setShowReplyInput(true)} className="text-xs font-bold hover:underline">
+          Reply
         </button>
-      </div>
+      )}
+
+      {/* Visa input-fältet och knappen om showReplyInput är true */}
+      {showReplyInput && (
+        <div className='mt-2 flex gap-2'>
+          <Input
+            type='text'
+            placeholder='Reply...'
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+          />
+          <button onClick={handleAddReply}>
+            <LuSend style={{ fontSize: '1.3rem' }} />
+          </button>
+        </div>
+      )}
 
       {/* Visa alla svar med tidsstämplar */}
       {replies && replies.map((reply) => {
@@ -47,8 +59,8 @@ const CommentOnComment = ({ commentId, replies, onAddReply, onDeleteReply }: Com
         const canManage = user?.id === reply.creator.id || isModerator;
 
         return (
-          <div key={reply.id} className="mt-2 ml-4">
-            <div className="flex justify-between text-xs my-2">
+          <div key={reply.id} className="mt-2">
+            <div className="flex justify-between text-xs my-2 border-t border-slate-100 dark:border-slate-800">
               <p>{reply.creator.userName}</p>
               <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
             </div>

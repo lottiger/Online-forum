@@ -5,12 +5,12 @@ const AnswerButton = ({ isAnswer, canToggle, category, onToggle }: AnswerButtonP
   const isQNA = category === 'QNA'; // Kontrollera om kategorin är QNA
 
   return (
-    <div className='hover:text-green-700 duration-300'
+    <div className='hover:text-green-500 duration-300'
       onClick={canToggle && isQNA ? onToggle : undefined}
       style={{ cursor: canToggle && isQNA ? 'pointer' : 'default' }}
     >
       {isAnswer ? (
-        <CiCircleCheck style={{ fontSize: '1.3rem', color: 'green', fontWeight: 'bold' }} />
+        <CiCircleCheck style={{ fontSize: '1.3rem', color: '#22c55e', fontWeight: 'bold' }} />
       ) : (
         <CiCircleCheck style={{ fontSize: '1.3rem' }} />
       )}

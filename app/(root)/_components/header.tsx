@@ -14,7 +14,7 @@ const Header = () => {
     <div className='py-2 border-b'>
       <div className='flex justify-between items-center px-4'>
         <Link href='/'>
-          <h1 className='border-2 rounded-full p-3 bg-pink-400'>
+          <h1 className='border-2 rounded-full p-3 bg-pink-400 dark:text-slate-950 border-slate-300'>
           <VscCommentDiscussion style={{ fontSize: '2rem' }} />
             </h1>
         </Link>

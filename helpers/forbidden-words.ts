@@ -3,6 +3,7 @@ export const forbiddenWords: string[] = [
     'fuck',
     'bitch',
     'jävlar',
+    'fan',
     // Lägg till fler olämpliga ord här
   ];
 

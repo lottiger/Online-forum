@@ -140,6 +140,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
 
           return (
             <li key={comment.id} className="py-4 border-t">
+              <div className='p-1 bg-slate-100 dark:bg-slate-800 rounded'>
               <div className='flex justify-between text-xs my-4'>
                 <p>{comment.creator.userName}</p>
                 <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
@@ -163,6 +164,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                   onDelete={handleDeleteComment}
                 />
               </div>
+              </div>
               <CommentOnComment
                 commentId={comment.id}
                 replies={comment.replies || []}
@@ -176,6 +178,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                   localStorage.setItem('comments', JSON.stringify(updatedComments));
                 }}
               />
+             
             </li>
           );
         })}

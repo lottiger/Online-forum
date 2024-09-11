@@ -11,13 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-
+import { useToast } from '@/hooks/use-toast'; // Importera toast hook
 
 const EditThread = ({ threadId, creatorId, onThreadUpdate, onThreadDelete }: EditThreadProps): JSX.Element => {
   const [thread, setThread] = useState<Thread | null>(null);
   const [newTitle, setNewTitle] = useState<string>('');
   const [newDescription, setNewDescription] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast(); // Använd toast hook
 
   useEffect(() => {
     // Hämta tråden från localStorage
@@ -33,7 +34,10 @@ const EditThread = ({ threadId, creatorId, onThreadUpdate, onThreadDelete }: Edi
 
   const handleUpdateThread = () => {
     if (!newTitle.trim() || !newDescription.trim()) {
-      alert("Title and description cannot be empty.");
+      toast({
+        title: "Error",
+        description: "Title and description cannot be empty.",
+      });
       return;
     }
 
@@ -55,15 +59,31 @@ const EditThread = ({ threadId, creatorId, onThreadUpdate, onThreadDelete }: Edi
 
   const handleDeleteThread = () => {
     if (thread) {
-      const confirmDelete = window.confirm('Are you sure you want to delete this thread?');
-      if (confirmDelete) {
-        const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
-        const updatedThreads = storedThreads.filter((t) => t.id !== thread.id);
-        localStorage.setItem('threads', JSON.stringify(updatedThreads));
+      // Använd toast för att visa bekräftelse
+      toast({
+        title: "Delete thread?",
+        description: "Are you sure you want to delete this thread?",
+        action: (
+          <Button
+            variant="destructive"
+            onClick={() => {
+              const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
+              const updatedThreads = storedThreads.filter((t) => t.id !== thread.id);
+              localStorage.setItem('threads', JSON.stringify(updatedThreads));
 
-        onThreadDelete(thread.id);
-        setIsOpen(false);
-      }
+              onThreadDelete(thread.id);
+              setIsOpen(false);
+
+              toast({
+                title: "Thread Deleted",
+                description: "The thread has been successfully deleted.",
+              });
+            }}
+          >
+            Confirm
+          </Button>
+        ),
+      });
     }
   };
 

@@ -59,9 +59,10 @@ const CommentOnComment = ({ commentId, replies, onAddReply, onDeleteReply }: Com
         const canManage = user?.id === reply.creator.id || isModerator;
 
         return (
-          <div key={reply.id} className="mt-2">
-            <div className="flex justify-between text-xs my-2 border-t border-slate-100 dark:border-slate-800">
-              <p>{reply.creator.userName}</p>
+          <div key={reply.id} className="mt-2 p-1 bg-slate-100 dark:bg-slate-800 rounded">
+            {/* <div className="flex justify-between text-xs my-2 border-t border-slate-100 dark:border-slate-800"> */}
+            <div className="flex justify-between text-xs my-2 ">
+              <p>{reply.creator.userName} replys:</p>
               <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
             </div>
             <div className="flex justify-between">

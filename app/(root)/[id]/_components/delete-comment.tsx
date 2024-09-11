@@ -26,6 +26,7 @@ const DeleteComment = ({ creatorId, commentId, userId, isModerator, onDelete }: 
               toast({
                 title: "Comment Deleted",
                 description: "The comment has been successfully deleted.",
+                duration: 2000,
               });
               setIsConfirming(false); // Återställ bekräftelsetillståndet
             }}

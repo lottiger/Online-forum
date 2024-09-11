@@ -59,30 +59,17 @@ const EditThread = ({ threadId, creatorId, onThreadUpdate, onThreadDelete }: Edi
 
   const handleDeleteThread = () => {
     if (thread) {
-      // Använd toast för att visa bekräftelse
+      const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
+      const updatedThreads = storedThreads.filter((t) => t.id !== thread.id);
+      localStorage.setItem('threads', JSON.stringify(updatedThreads));
+  
+      onThreadDelete(thread.id);
+      setIsOpen(false);
+  
       toast({
-        title: "Delete thread?",
-        description: "Are you sure you want to delete this thread?",
-        action: (
-          <Button
-            variant="destructive"
-            onClick={() => {
-              const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
-              const updatedThreads = storedThreads.filter((t) => t.id !== thread.id);
-              localStorage.setItem('threads', JSON.stringify(updatedThreads));
-
-              onThreadDelete(thread.id);
-              setIsOpen(false);
-
-              toast({
-                title: "Thread Deleted",
-                description: "The thread has been successfully deleted.",
-              });
-            }}
-          >
-            Confirm
-          </Button>
-        ),
+        title: "Thread Deleted",
+        description: "The thread has been successfully deleted.",
+        duration: 2000,
       });
     }
   };

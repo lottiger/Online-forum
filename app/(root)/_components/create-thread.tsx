@@ -70,7 +70,7 @@ const CreateThread = (): JSX.Element => {
 
     // Spara tråden i localStorage
     const threads = JSON.parse(localStorage.getItem('threads') || '[]');
-    threads.push(newThread);
+    threads.unshift(newThread);
     localStorage.setItem('threads', JSON.stringify(threads));
 
     console.log('Thread created:', newThread);

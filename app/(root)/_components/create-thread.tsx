@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'; 
 import { Textarea } from '@/components/ui/textarea'; 
@@ -7,6 +7,8 @@ import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { censorComment } from '@/helpers/forbidden-words';
+
 
 const CreateThread = (): JSX.Element => {
   const router = useRouter();
@@ -48,15 +50,20 @@ const CreateThread = (): JSX.Element => {
       return;
     }
 
+    // Censurera titel och beskrivning
+    const censoredTitle = censorComment(title);
+    const censoredDescription = censorComment(description);
+
     const newThread: Thread = {
       id: Date.now(),
-      title,
+      title: censoredTitle, // Använd den censurerade titeln
       category,
       creationDate: new Date().toISOString(),
-      description,
+      description: censoredDescription, // Använd den censurerade beskrivningen
       creator: {
         id: user.id, // Använd ClerkUser id direkt
-        userName: user.username || user.primaryEmailAddress?.emailAddress || ""
+        userName: user.username || user.primaryEmailAddress?.emailAddress || "",
+        isModerator: !!user.publicMetadata?.isModerator, // Hämta isModerator från user.metadata
       },
       isLocked: false,
     };
@@ -102,6 +109,7 @@ const CreateThread = (): JSX.Element => {
           <SelectContent>
             <SelectItem value="DISCUSSION">Discussion</SelectItem>
             <SelectItem value="QNA">Q&A</SelectItem>
+            <SelectItem value="THREAD">Thread</SelectItem>
           </SelectContent>
         </Select>
 

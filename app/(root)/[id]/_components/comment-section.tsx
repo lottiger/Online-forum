@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import AnswerButton from './answer-button';
 import CommentOnComment from './comment-on-comment';
 import DeleteComment from './delete-comment';
+import { censorComment } from '@/helpers/forbidden-words';
+
 
 function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element {
   const [comments, setComments] = useState<ForumComment[]>([]);
@@ -17,11 +19,11 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
   // Hämta alla kommentarer från localStorage när tråden laddas
   useEffect(() => {
     const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
-    const threadComments = storedComments.filter((comment: ForumComment) => comment.threadId === threadId); // Lägg till typ för comment här
+    const threadComments = storedComments.filter(comment => comment.threadId === threadId);
     setComments(threadComments);
   }, [threadId]);
 
-  // Lägg till en ny kommentar
+  // Lägg till en ny kommentar med censurering
   const handleAddComment = () => {
     if (newComment.trim() === '' || !user) {
       toast({
@@ -31,46 +33,48 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
       return;
     }
 
+    // Censurera kommentaren innan den läggs till
+    const censoredComment = censorComment(newComment);
+
     const newCommentObj: ForumComment = {
       id: Date.now(),
       threadId: threadId,
-      content: newComment,
+      content: censoredComment, // Använd censurerad text
       creator: { 
         id: user.id, 
         userName: user.firstName || user.username || 'Anonymous',
-        isModerator: !!user.publicMetadata?.isModerator, // Se till att detta hanteras korrekt
+        isModerator: !!user.publicMetadata?.isModerator,
       },
       creationDate: new Date().toISOString(),
       replies: [], // Initiera replies som en tom array
     };
 
     // Uppdatera kommentarer i state och localStorage
-    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
-    const updatedComments = [...storedComments, newCommentObj];
+    const updatedComments = [...comments, newCommentObj];
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments.filter((comment: ForumComment) => comment.threadId === threadId)); // Typ här också
+    setComments(updatedComments);
     setNewComment('');
   };
 
   // Hantera borttagning av en kommentar
   const handleDeleteComment = (commentId: number) => {
-    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
-    const updatedComments = storedComments.filter((comment: ForumComment) => comment.id !== commentId); // Typ här
+    const updatedComments = comments.filter(comment => comment.id !== commentId);
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments.filter((comment: ForumComment) => comment.threadId === threadId)); // Typ här
+    setComments(updatedComments);
   };
 
   // Hantera att lägga till ett svar på en kommentar
   const handleAddReply = (commentId: number, reply: string) => {
-    const storedComments = JSON.parse(localStorage.getItem('comments') || '[]');
-    const updatedComments = storedComments.map((comment: ForumComment) => // Typ här
+    const censoredReply = censorComment(reply); // Censurera svaret innan det läggs till
+
+    const updatedComments = comments.map(comment =>
       comment.id === commentId
         ? {
             ...comment,
             replies: [...(comment.replies || []), { 
               id: Date.now(), 
               threadId, 
-              content: reply, 
+              content: censoredReply, // Använd censurerad text för svaret
               creator: { 
                 id: user?.id || '', 
                 userName: user?.firstName || user?.username || 'Anonymous',
@@ -82,7 +86,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
         : comment
     );
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments.filter((comment: ForumComment) => comment.threadId === threadId)); // Typ här
+    setComments(updatedComments);
   };
 
   // Hantera toggling av en kommentar som "svar"
@@ -110,12 +114,10 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
       </div>
 
       <ul>
-        {comments.map((comment: ForumComment) => { // Typ här också
+        {comments.map((comment) => {
           const creationDate = new Date(comment.creationDate);
           const isValidDate = !isNaN(creationDate.getTime());
           const isAnswer = comment.id === commentAnswerId;
-
-          // Tillåt både trådskaparen och moderatorer att toggla svaret
           const canToggle = user?.id === creatorId || !!user?.publicMetadata?.isModerator;
           const isModerator = !!user?.publicMetadata?.isModerator;
           const canDelete = user?.id === comment.creator.id || isModerator; // Kontrollera raderingstillgång
@@ -130,7 +132,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 {category === 'QNA' && (
                   <AnswerButton
                     isAnswer={isAnswer}
-                    canToggle={canToggle} // Nu kan både trådskaparen och moderatorn toggla
+                    canToggle={canToggle}
                     category={category}
                     onToggle={() => handleAnswerToggle(comment.id)}
                   />
@@ -152,7 +154,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 onAddReply={handleAddReply}
                 onDeleteReply={(replyId) => {
                   const updatedReplies = comment.replies?.filter(reply => reply.id !== replyId) || [];
-                  const updatedComments = comments.map((c: ForumComment) => // Typ här
+                  const updatedComments = comments.map(c => 
                     c.id === comment.id ? { ...c, replies: updatedReplies } : c
                   );
                   setComments(updatedComments);

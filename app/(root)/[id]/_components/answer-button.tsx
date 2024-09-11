@@ -2,7 +2,7 @@ import React from 'react';
 import { CiCircleCheck } from 'react-icons/ci';
 
 const AnswerButton = ({ isAnswer, canToggle, category, onToggle }: AnswerButtonProps): JSX.Element => {
-  const isQNA = category === 'QNA'; // Kontrollera om kategorin är QNA
+  const isQNA = category === 'QNA'; 
 
   return (
     <div className='hover:text-green-500 duration-300'

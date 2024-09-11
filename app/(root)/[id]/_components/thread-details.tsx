@@ -42,10 +42,6 @@ const ThreadDetails = ({ threadId }: { threadId: number | undefined }): JSX.Elem
         <p>By {thread.creator.userName}</p>
       </div>
 
-      {/*
-
-
-      {/* Skicka in props för markering av svar */}
       <CommentSection
         threadId={thread.id}
         creatorId={thread.creator.id}

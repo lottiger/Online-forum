@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { useUser } from '@clerk/nextjs'; // Använd Clerk för användarhantering
+import { useUser } from '@clerk/nextjs'; 
 import LockThread from './lock-thread';
 import EditThread from './edit-thread';
 
@@ -13,7 +13,7 @@ const ThreadList = (): JSX.Element => {
   const router = useRouter();
 
   useEffect(() => {
-    // Hämta trådar från localStorage
+    
     const storedThreads = JSON.parse(localStorage.getItem('threads') || '[]');
     setThreads(storedThreads);
   }, []);
@@ -47,14 +47,14 @@ const ThreadList = (): JSX.Element => {
     localStorage.setItem('threads', JSON.stringify(updatedThreads));
   };
 
-  const isModerator = user?.publicMetadata?.isModerator || false; // Kolla om användaren är en moderator
+  const isModerator = user?.publicMetadata?.isModerator || false; 
 
   return (
     <div className='flex flex-col w-full px-10'>
       {threads.map((thread) => {
         const creationDate = new Date(thread.creationDate);
         const isValidDate = !isNaN(creationDate.getTime());
-        const isCreator = user && user.id === thread.creator.id; // Kolla om användaren är trådskaparen
+        const isCreator = user && user.id === thread.creator.id; 
 
         return (
           <section
@@ -66,17 +66,17 @@ const ThreadList = (): JSX.Element => {
                 <h3 className='font-semibold text-lg'>{thread.title}</h3>
               </div>
               <div className='flex gap-1'>
-                {/* Moderators eller trådskaparen kan hantera tråden */}
+               
                 {(isCreator || isModerator) && (
                   <>
-                    {/* Lås/öppna tråden */}
+                   
                     <LockThread
                       threadId={thread.id}
                       creatorId={thread.creator.id}
                       isLocked={thread.isLocked}
                       onLockToggle={handleLockToggle}
                     />
-                    {/* Redigera/radera tråden */}
+                    
                     <EditThread
                       threadId={thread.id}
                       creatorId={thread.creator.id}

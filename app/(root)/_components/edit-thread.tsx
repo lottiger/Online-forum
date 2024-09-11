@@ -11,17 +11,17 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast'; // Importera toast hook
+import { useToast } from '@/hooks/use-toast'; 
 
 const EditThread = ({ threadId, creatorId, onThreadUpdate, onThreadDelete }: EditThreadProps): JSX.Element => {
   const [thread, setThread] = useState<Thread | null>(null);
   const [newTitle, setNewTitle] = useState<string>('');
   const [newDescription, setNewDescription] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast(); // Använd toast hook
+  const { toast } = useToast(); 
 
   useEffect(() => {
-    // Hämta tråden från localStorage
+    
     const storedThreads: Thread[] = JSON.parse(localStorage.getItem('threads') || '[]');
     const foundThread = storedThreads.find((t) => t.id === threadId);
 

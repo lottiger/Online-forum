@@ -13,7 +13,7 @@ const Navbar = () => {
           </li>
           <li>
             <Link href='/' className='hover:underline'>
-              Profile
+              My threads
             </Link>
           </li>
           <li>

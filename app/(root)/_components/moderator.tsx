@@ -6,7 +6,7 @@ const Moderator: React.FC = () => {
 
   if (!user) return <div>Loading...</div>;
 
-  // Kontrollera om användaren är moderator från publicMetadata
+ 
   const isModerator = user.publicMetadata?.isModerator || false;
 
   return (

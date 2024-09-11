@@ -5,7 +5,7 @@ import { CiLock, CiUnlock } from 'react-icons/ci';
 import { useUser } from '@clerk/nextjs'; 
 
 const LockThread = ({ threadId, creatorId, isLocked, onLockToggle }: LockThreadProps): JSX.Element => {
-  const { user } = useUser(); // Hämta den inloggade användaren från Clerk
+  const { user } = useUser(); 
 
   const isModerator = user?.publicMetadata?.isModerator || false; // Kontrollera om användaren är moderator
   const isCreator = user?.id === creatorId; // Kontrollera om användaren är skaparen av tråden

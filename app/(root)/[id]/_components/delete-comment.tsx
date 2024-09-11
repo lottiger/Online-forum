@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { CiTrash } from "react-icons/ci";
-import { useToast } from '@/hooks/use-toast'; // Importera toast-hooken
-import { Button } from '@/components/ui/button'; // Använd Button-komponenten
+import { useToast } from '@/hooks/use-toast'; 
+import { Button } from '@/components/ui/button'; 
 
 const DeleteComment = ({ creatorId, commentId, userId, isModerator, onDelete }: DeleteCommentProps): JSX.Element => {
-  const [isConfirming, setIsConfirming] = useState(false); // För att hantera bekräftelsen
-  const { toast } = useToast(); // Använd toast hook
+  const [isConfirming, setIsConfirming] = useState(false); 
+  const { toast } = useToast(); 
 
   // Kontrollera om den inloggade användaren är moderator eller skaparen av kommentaren
   const canDelete = isModerator || userId === creatorId;

@@ -9,7 +9,6 @@ import CommentOnComment from './comment-on-comment';
 import DeleteComment from './delete-comment';
 import { censorComment } from '@/helpers/forbidden-words';
 
-
 function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, category }: CommentSectionProps): JSX.Element {
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
@@ -39,62 +38,79 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
     const newCommentObj: ForumComment = {
       id: Date.now(),
       threadId: threadId,
-      content: censoredComment, // Använd censurerad text
-      creator: { 
-        id: user.id, 
+      content: censoredComment,
+      creator: {
+        id: user.id,
         userName: user.firstName || user.username || 'Anonymous',
         isModerator: !!user.publicMetadata?.isModerator,
       },
       creationDate: new Date().toISOString(),
-      replies: [], // Initiera replies som en tom array
+      replies: [],
     };
 
-    // Uppdatera kommentarer i state och localStorage
-    const updatedComments = [...comments, newCommentObj];
+    // Hämta alla kommentarer från localStorage
+    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
+    
+    // Lägg till den nya kommentaren till den aktuella tråden
+    const updatedComments = [...storedComments, newCommentObj];
+
+    // Spara tillbaka alla kommentarer
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments);
+    setComments(updatedComments.filter(comment => comment.threadId === threadId));
     setNewComment('');
   };
 
   // Hantera borttagning av en kommentar
   const handleDeleteComment = (commentId: number) => {
-    const updatedComments = comments.filter(comment => comment.id !== commentId);
+    // Hämta alla kommentarer från localStorage
+    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
+    
+    // Uppdatera bara den aktuella trådens kommentarer
+    const updatedComments = storedComments.filter(comment => comment.id !== commentId);
+
+    // Spara tillbaka alla kommentarer
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments);
+    setComments(updatedComments.filter(comment => comment.threadId === threadId));
   };
 
   // Hantera att lägga till ett svar på en kommentar
   const handleAddReply = (commentId: number, reply: string) => {
-    const censoredReply = censorComment(reply); // Censurera svaret innan det läggs till
+    const censoredReply = censorComment(reply);
 
-    const updatedComments = comments.map(comment =>
+    // Hämta alla kommentarer från localStorage
+    const storedComments: ForumComment[] = JSON.parse(localStorage.getItem('comments') || '[]');
+
+    // Uppdatera bara den aktuella trådens kommentarer
+    const updatedComments = storedComments.map(comment =>
       comment.id === commentId
         ? {
             ...comment,
-            replies: [...(comment.replies || []), { 
-              id: Date.now(), 
-              threadId, 
-              content: censoredReply, // Använd censurerad text för svaret
-              creator: { 
-                id: user?.id || '', 
+            replies: [...(comment.replies || []), {
+              id: Date.now(),
+              threadId,
+              content: censoredReply,
+              creator: {
+                id: user?.id || '',
                 userName: user?.firstName || user?.username || 'Anonymous',
                 isModerator: !!user?.publicMetadata?.isModerator,
               },
-              creationDate: new Date().toISOString() 
+              creationDate: new Date().toISOString(),
             }],
           }
         : comment
     );
+
+    // Spara tillbaka alla kommentarer
     localStorage.setItem('comments', JSON.stringify(updatedComments));
-    setComments(updatedComments);
+    setComments(updatedComments.filter(comment => comment.threadId === threadId));
   };
 
   // Hantera toggling av en kommentar som "svar"
   const handleAnswerToggle = (commentId: number) => {
     if (commentId === commentAnswerId) {
-      onAnswerSelect(null); // Avmarkera svaret
+      onAnswerSelect(null);
     } else {
-      onAnswerSelect(commentId); // Markera kommentaren som svaret
+      onAnswerSelect(commentId);
     }
   };
 
@@ -120,7 +136,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
           const isAnswer = comment.id === commentAnswerId;
           const canToggle = user?.id === creatorId || !!user?.publicMetadata?.isModerator;
           const isModerator = !!user?.publicMetadata?.isModerator;
-          const canDelete = user?.id === comment.creator.id || isModerator; // Kontrollera raderingstillgång
+          const canDelete = user?.id === comment.creator.id || isModerator;
 
           return (
             <li key={comment.id} className="py-4 border-t">
@@ -128,7 +144,6 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 <p>{comment.creator.userName}</p>
                 <p>{isValidDate ? `${formatDistanceToNow(creationDate)} ago` : 'Invalid date'}</p>
 
-                {/* Rendera bara AnswerButton om kategorin är QNA */}
                 {category === 'QNA' && (
                   <AnswerButton
                     isAnswer={isAnswer}
@@ -154,7 +169,7 @@ function CommentSection({ threadId, creatorId, commentAnswerId, onAnswerSelect, 
                 onAddReply={handleAddReply}
                 onDeleteReply={(replyId) => {
                   const updatedReplies = comment.replies?.filter(reply => reply.id !== replyId) || [];
-                  const updatedComments = comments.map(c => 
+                  const updatedComments = comments.map(c =>
                     c.id === comment.id ? { ...c, replies: updatedReplies } : c
                   );
                   setComments(updatedComments);
